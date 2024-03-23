@@ -127,19 +127,12 @@ function App() {
 
 	return (
 		<>
+
 			<h1 style={{ textAlign: "center", color: '#fff' }}>Video Call</h1>
+
 		<div className="container">
-			<div className="video-container">
-				<div className="video">
-					{stream &&  <video playsInline muted ref={myVideo} autoPlay style={{ width: "400px" }} />}
-				</div>
-				<div className="video">
-					{callAccepted && !callEnded ?
-					<video playsInline ref={userVideo} autoPlay style={{ width: "400px"}} />:
-					null}
-				</div>
-			</div>
-			<div className="myId">
+      
+    <div className="myId">
 				<TextField
 					id="filled-basic"
 					label="Name"
@@ -161,7 +154,6 @@ function App() {
 					value={idToCall}
 					onChange={(e) => setIdToCall(e.target.value)}
 				/>
-        
 				<div className="call-button">
 					{callAccepted && !callEnded ? (
 						<Button variant="contained" color="secondary" onClick={leaveCall}>
@@ -196,6 +188,40 @@ function App() {
       </div>
 			</div>
 
+			<div className="video-container">
+    
+				<div className="video">
+					{stream &&  <video playsInline muted ref={myVideo} autoPlay style={{ width: "400px" }} />}
+     
+				</div>
+				<div className="video">
+  
+					{callAccepted && !callEnded ?
+					<video playsInline ref={userVideo} autoPlay style={{ width: "400px"}} />:
+					null}
+         
+				</div>
+			</div>
+
+      
+      <div className="form-container">
+    <form className="form">
+        <div className="form-group">
+            <label htmlFor="patientName">Patient Name</label>
+            <input type="text" id="patientName" name="patientName" />
+        </div>
+        <div className="form-group">
+            <label htmlFor="patientId">Patient ID</label>
+            <input type="text" id="patientId" name="patientId" />
+        </div>
+        <div className="form-group">
+            <label htmlFor="prescription">Prescription</label>
+            <textarea id="prescription" name="prescription"></textarea>
+        </div>
+        <button type="submit" className="add-prescription-btn">Add Prescription</button>
+    </form>
+      </div>
+
       
 			<div>
 				{receivingCall && !callAccepted ? (
@@ -208,12 +234,6 @@ function App() {
 				) : null}
 			</div>
       
-
-
-
-
-
-
 
 		</div>
  
