@@ -3,12 +3,16 @@ import IconButton from "@material-ui/core/IconButton"
 import TextField from "@material-ui/core/TextField"
 import AssignmentIcon from "@material-ui/icons/Assignment"
 import PhoneIcon from "@material-ui/icons/Phone"
-import React, { useEffect, useRef, useState } from "react"
+
 import { CopyToClipboard } from "react-copy-to-clipboard"
 import Peer from "simple-peer"
 import io from "socket.io-client"
 import "./App.css"
-
+import MicIcon from "@material-ui/icons/Mic"; // Import microphone icon
+import MicOffIcon from "@material-ui/icons/MicOff";
+import React, { useEffect, useRef, useState } from "react";
+import VideoIcon from "@material-ui/icons/VideoCall"; 
+import  VideoOffIcon from "@material-ui/icons/VideoCall";
 
 const socket = io.connect('http://localhost:5000')
 function App() {
@@ -21,6 +25,10 @@ function App() {
 	const [ idToCall, setIdToCall ] = useState("")
 	const [ callEnded, setCallEnded] = useState(false)
 	const [ name, setName ] = useState("")
+  const [isVideoOn, setIsVideoOn] = useState(true);
+  const [isAudioOn, setIsAudioOn] = useState(true);
+
+
 	const myVideo = useRef(null)
 	const userVideo = useRef()
 	const connectionRef= useRef()
@@ -29,8 +37,8 @@ function App() {
 		navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
 			setStream(stream)
 		  if (myVideo.current) {
-        myVideo.current.srcObject = stream;
-    }
+            myVideo.current.srcObject = stream;
+        }
 		})
 
 	socket.on("me", (id) => {
@@ -43,6 +51,7 @@ function App() {
 			setName(data.name)
 			setCallerSignal(data.signal)
 		})
+  
 	}, [])
 
 	const callUser = (id) => {
@@ -94,10 +103,31 @@ function App() {
 		setCallEnded(true)
 		connectionRef.current.destroy()
 	}
+  const toggleVideoStream = () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => {
+        if (track.kind === "video") {
+          track.enabled = !track.enabled;
+        }
+      });
+      setIsVideoOn(!isVideoOn);
+    }
+  };
+   // Function to toggle audio stream on/off
+   const toggleAudioStream = () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => {
+        if (track.kind === "audio") {
+          track.enabled = !track.enabled;
+        }
+      });
+      setIsAudioOn(!isAudioOn);
+    }
+  };
 
 	return (
 		<>
-			<h1 style={{ textAlign: "center", color: '#fff' }}>Zoomish</h1>
+			<h1 style={{ textAlign: "center", color: '#fff' }}>Video Call</h1>
 		<div className="container">
 			<div className="video-container">
 				<div className="video">
@@ -131,6 +161,7 @@ function App() {
 					value={idToCall}
 					onChange={(e) => setIdToCall(e.target.value)}
 				/>
+        
 				<div className="call-button">
 					{callAccepted && !callEnded ? (
 						<Button variant="contained" color="secondary" onClick={leaveCall}>
@@ -143,7 +174,29 @@ function App() {
 					)}
 					{idToCall}
 				</div>
+        
+        
+        <div style={{ textAlign: "center" }}>
+        {/* Toggle video icon */}
+        <IconButton onClick={toggleVideoStream}>
+          {isVideoOn ? (
+            <VideoIcon fontSize="large" color="primary" /> // Video icon when video is on
+          ) : (
+            <VideoOffIcon fontSize="large" color="secondary" /> // Customized video off icon when video is off
+          )}
+        </IconButton>
+        {/* Toggle audio icon */}
+        <IconButton onClick={toggleAudioStream}>
+          {isAudioOn ? (
+            <MicIcon fontSize="large" color="primary" /> // Microphone icon when audio is on
+          ) : (
+            <MicOffIcon fontSize="large" color="secondary" /> // Customized microphone off icon when audio is off
+          )}
+        </IconButton>
+      </div>
 			</div>
+
+      
 			<div>
 				{receivingCall && !callAccepted ? (
 						<div className="caller">
@@ -154,7 +207,16 @@ function App() {
 					</div>
 				) : null}
 			</div>
+      
+
+
+
+
+
+
+
 		</div>
+ 
 		</>
 	)
 }
